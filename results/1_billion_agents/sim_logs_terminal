@@ -1,0 +1,9 @@
+giray_cispa_de@biodynamo-run-1billion-02:~$ sudo dmesg | grep -i -E "oom|killed process"
+[  600.388968] epidemiology invoked oom-killer: gfp_mask=0x140dca(GFP_HIGHUSER_MOVABLE|__GFP_COMP|__GFP_ZERO), order=0, oom_score_adj=0
+[  600.389000]  oom_kill_process+0x116/0x270
+[  600.389002]  ? oom_evaluate_task+0x143/0x1e0
+[  600.389006]  __alloc_pages_may_oom+0x112/0x1e0
+[  600.389125] [  pid  ]   uid  tgid total_vm      rss rss_anon rss_file rss_shmem pgtables_bytes swapents oom_score_adj name
+[  600.389200] oom-kill:constraint=CONSTRAINT_NONE,nodemask=(null),cpuset=user.slice,mems_allowed=0,global_oom,task_memcg=/user.slice/user-465724639.slice/session-1.scope,task=epidemiology,pid=28758,uid=465724639
+[  600.389247] Out of memory: Killed process 28758 (epidemiology) total-vm:64591924kB, anon-rss:60672256kB, file-rss:2944kB, shmem-rss:0kB, UID:465724639 pgtables:120192kB oom_score_adj:0
+[  602.464156] oom_reaper: reaped process 28758 (epidemiology), now anon-rss:0kB, file-rss:0kB, shmem-rss:0kB

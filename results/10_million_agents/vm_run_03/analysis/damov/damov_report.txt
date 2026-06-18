@@ -1,0 +1,45 @@
+======================================================================
+DAMOV CHARACTERISATION REPORT
+======================================================================
+
+DAMOV headline metrics
+----------------------------------------------------------------------
+  llc_mpki              mean=    7.2943  CV= 0.04%  range= 0.08%  → ✓ EXCEEDS
+    (LLC MPKI > 1 → memory-bound candidate)
+  lfmr                  mean=    0.7731  CV= 1.25%  range= 2.32%  → ✓ EXCEEDS
+    (LFMR > 0.1 → significant LLC traffic)
+  ipc                   mean=    0.4192  CV= 0.17%  range= 0.32%  → ✓ EXCEEDS
+    (IPC < 1.0 → limited by memory/stalls)
+  mem_bound_frac        mean=    0.5988  CV= 0.08%  range= 0.14%  → ✓ EXCEEDS
+    (Mem-bound fraction > 0.2 → memory-bound)
+
+Top-Down L2 memory sub-breakdown
+----------------------------------------------------------------------
+  l1_stall_frac         mean=    0.2582  CV= 0.00%  range= 0.01%
+  l2_stall_frac         mean=    0.2562  CV= 0.01%  range= 0.02%
+  l2_hit_rate           mean=    0.2246  CV= 4.34%  range= 8.05%
+  l2_miss_rate_req      mean=    0.7024  CV= 0.18%  range= 0.32%
+  l1_miss_rate          mean=    0.0281  CV= 1.31%  range= 2.46%
+
+Top-Down L1 note
+----------------------------------------------------------------------
+  Retiring / Bad Speculation / Front-End Bound are not directly
+  measurable from this 13-event perf group (would require separate
+  PERF_METRICS_* counters on Sapphire Rapids). Only Memory Bound
+  (= TOPDOWN.MEMORY_BOUND_SLOTS / TOPDOWN.SLOTS_P) is available.
+
+DAMOV threshold summary
+----------------------------------------------------------------------
+  LLC MPKI > 1 → memory-bound candidate
+    measured mean = 7.2943  ✓ EXCEEDS
+  LFMR > 0.1 → significant LLC traffic
+    measured mean = 0.7731  ✓ EXCEEDS
+  Mem-bound fraction > 0.2 → memory-bound
+    measured mean = 0.5988  ✓ EXCEEDS
+  IPC < 1.0 → limited by memory/stalls
+    measured mean = 0.4192  ✓ EXCEEDS
+
+  ✓ ALL DAMOV thresholds exceeded → workload qualifies as
+    memory-bound; PIM offloading is motivated.
+
+======================================================================

@@ -1,0 +1,9 @@
+setup_completed_at=2026-06-16T08:25:21Z
+hostname=biodynamo-run-10million-01
+kernel=6.8.0-1060-gcp
+perf_event_paranoid=1
+biodynamo_path=/home/giray_cispa_de/biodynamo
+epidemiology_binary=/home/giray_cispa_de/biodynamo-fork/demo/epidemiology/build/epidemiology
+cpu_model=INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.30GHz
+numa_nodes=1
+perf_version=perf version 6.8.12

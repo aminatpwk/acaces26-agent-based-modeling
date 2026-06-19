@@ -1,0 +1,311 @@
+
+***********************************************
+***********************************************
+[1mSimulation Metadata:[0m
+***********************************************
+
+[1mGeneral[0m
+Command				: /home/giray_cispa_de/biodynamo-fork/demo/epidemiology/build/epidemiology --inline-config {"bdm::Param": {"export_visualization": false, "insitu_visualization": false, "live_visualization": false}} --config /home/giray_cispa_de/biodynamo-fork/demo/epidemiology/measles.json 
+Simulation name			: epidemiology1
+Total simulation runtime	: 32637559 ms
+Peak memory usage (MB)		: 55307.1
+Number of iterations executed	: 3000
+Number of agents		: 200000000
+Output directory		: output/epidemiology1
+  size				: 4.0K
+BioDynaMo version:		: v1.05.152-e8c5fbaa
+BioDynaMo real type:		: double
+
+***********************************************
+
+[1mTotal execution time per operation[0m
+agent ops: 18070246
+behavior: 0
+bound space: 1
+continuum: 8
+discretization: 1
+load balancing: 24218
+set up iteration: 91
+tear down iteration: 21
+update environment: 10218445
+update staticness: 14
+update time series: 4303028
+visualize: 3
+
+***********************************************
+
+[1mThread Info[0m
+max_threads		: 16
+num_numa nodes		: 1
+thread to numa mapping	: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+thread id in numa node	: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+num threads per numa	: 16 
+
+***********************************************
+
+[1mAgents per numa node[0m
+numa node 0 -> size: 200000000
+
+***********************************************
+
+[1mParameters[0m
+{
+    "bdm::OptimizationParam": {
+        "_typename": "bdm::OptimizationParam",
+        "algorithm": "",
+        "max_iterations": 100,
+        "params": [],
+        "repetition": 1
+    },
+    "bdm::Param": {
+        "_typename": "bdm::Param",
+        "backup_file": "",
+        "backup_interval": 1800,
+        "bound_space": 2,
+        "cache_neighbors": false,
+        "calculate_gradients": true,
+        "compute_target": "cpu",
+        "debug_numa": false,
+        "detect_static_agents": false,
+        "diffusion_boundary_condition": "Neumann",
+        "diffusion_method": "euler",
+        "environment": "uniform_grid",
+        "execution_order": 0,
+        "export_visualization": false,
+        "insitu_visualization": false,
+        "mapped_data_array_mode": 0,
+        "max_bound": 5000,
+        "mem_mgr_aligned_pages_shift": 5,
+        "mem_mgr_growth_rate": 1.1,
+        "mem_mgr_max_mem_per_thread_factor": 1,
+        "min_bound": 0,
+        "minimize_memory_while_rebalancing": true,
+        "nanoflann_depth": 10,
+        "numerical_ode_solver": 1,
+        "opencl_debug": false,
+        "output_dir": "output",
+        "plot_memory_layout": false,
+        "preferred_gpu": -1,
+        "progress_bar_time_unit": "s",
+        "pv_insitu_pipeline": "/home/giray_cispa_de/biodynamo-v1.05.152/include/core/visualization/paraview/default_insitu_pipeline.py",
+        "pv_insitu_pipelinearguments": "",
+        "random_seed": 0,
+        "remove_output_dir_contents": true,
+        "restore_file": "",
+        "root_visualization": false,
+        "scheduling_batch_size": 1000,
+        "show_simulation_step": 0,
+        "simulation_max_displacement": 3,
+        "simulation_time_step": 1,
+        "statistics": true,
+        "thread_safety_mechanism": 1,
+        "unibn_bucketsize": 16,
+        "unschedule_default_operations": [],
+        "use_bdm_mem_mgr": true,
+        "use_progress_bar": false,
+        "visualization_compress_pv_files": true,
+        "visualization_engine": "paraview",
+        "visualization_export_generate_pvsm": false,
+        "visualization_interval": 1,
+        "visualize_agents": {
+            "Person": [
+                "state_"
+            ],
+            "_typename": "map<string,set<string> >"
+        },
+        "visualize_diffusion": []
+    },
+    "bdm::SimParam": {
+        "_typename": "bdm::SimParam",
+        "agent_diameter": 2,
+        "agent_speed": 5.7859,
+        "beta": 0.06719,
+        "gamma": 0.00521,
+        "infection_probablity": 0.285,
+        "infection_radius": 10.5092,
+        "initial_population_infected": 10000000,
+        "initial_population_susceptible": 190000000,
+        "mode": "sim-and-analytical",
+        "moving_agents_ratio": 1,
+        "no_legend": false,
+        "number_of_iterations": 3000,
+        "recovery_probability": 0.00521,
+        "repeat": 3,
+        "result_plot": "result",
+        "root_style": {
+            "_typename": "bdm::experimental::Style",
+            "fAttDate": {
+                "_typename": "TAttText",
+                "fTextAlign": 11,
+                "fTextAngle": 0,
+                "fTextColor": 1,
+                "fTextFont": 62,
+                "fTextSize": 0.025
+            },
+            "fBarOffset": 0,
+            "fBarWidth": 1,
+            "fBits": 0,
+            "fCanvasBorderMode": 0,
+            "fCanvasBorderSize": 2,
+            "fCanvasColor": 0,
+            "fCanvasDefH": 500,
+            "fCanvasDefW": 700,
+            "fCanvasDefX": 10,
+            "fCanvasDefY": 10,
+            "fCanvasPreferGL": false,
+            "fCapLinePS": 0,
+            "fColorModelPS": 0,
+            "fDateX": 0.01,
+            "fDateY": 0.01,
+            "fDrawBorder": 0,
+            "fEndErrorSize": 2,
+            "fErrorX": 0.5,
+            "fFillColor": 19,
+            "fFillStyle": 1001,
+            "fFitFormat": "5.4g",
+            "fFrameBorderMode": 0,
+            "fFrameBorderSize": 1,
+            "fFrameFillColor": 0,
+            "fFrameFillStyle": 1001,
+            "fFrameLineColor": 1,
+            "fFrameLineStyle": 1,
+            "fFrameLineWidth": 1,
+            "fFuncColor": 2,
+            "fFuncStyle": 1,
+            "fFuncWidth": 2,
+            "fGridColor": 0,
+            "fGridStyle": 3,
+            "fGridWidth": 1,
+            "fHatchesLineWidth": 1,
+            "fHatchesSpacing": 1,
+            "fHeaderPS": "",
+            "fHistFillColor": 0,
+            "fHistFillStyle": 1001,
+            "fHistLineColor": 602,
+            "fHistLineStyle": 1,
+            "fHistLineWidth": 1,
+            "fHistMinimumZero": false,
+            "fHistTopMargin": 0.05,
+            "fImageScaling": 1,
+            "fJoinLinePS": 0,
+            "fLegendBorderSize": 1,
+            "fLegendFillColor": 0,
+            "fLegendFont": 42,
+            "fLegendTextSize": 0,
+            "fLegoInnerR": 0.5,
+            "fLineColor": 1,
+            "fLineScalePS": 3,
+            "fLineStyle": 1,
+            "fLineWidth": 1,
+            "fMarkerColor": 1,
+            "fMarkerSize": 1,
+            "fMarkerStyle": 1,
+            "fName": "",
+            "fNumberContours": 20,
+            "fOptDate": 0,
+            "fOptFile": 0,
+            "fOptFit": 0,
+            "fOptLogx": 0,
+            "fOptLogy": 0,
+            "fOptLogz": 0,
+            "fOptStat": 1111,
+            "fOptTitle": 1,
+            "fPadBorderMode": 0,
+            "fPadBorderSize": 2,
+            "fPadBottomMargin": 0.1,
+            "fPadColor": 0,
+            "fPadGridX": false,
+            "fPadGridY": false,
+            "fPadLeftMargin": 0.1,
+            "fPadRightMargin": 0.1,
+            "fPadTickX": 0,
+            "fPadTickY": 0,
+            "fPadTopMargin": 0.1,
+            "fPaintTextFormat": "g",
+            "fPaperSizeX": 20,
+            "fPaperSizeY": 26,
+            "fScreenFactor": 1,
+            "fShowEditor": 0,
+            "fShowEventStatus": 0,
+            "fShowToolBar": 0,
+            "fStatBorderSize": 1,
+            "fStatColor": 0,
+            "fStatFont": 42,
+            "fStatFontSize": 0,
+            "fStatFormat": "6.4g",
+            "fStatH": 0.16,
+            "fStatStyle": 1001,
+            "fStatTextColor": 1,
+            "fStatW": 0.2,
+            "fStatX": 0.98,
+            "fStatY": 0.935,
+            "fStripDecimals": true,
+            "fTextAlign": 11,
+            "fTextAngle": 0,
+            "fTextColor": 1,
+            "fTextFont": 62,
+            "fTextSize": 0.05,
+            "fTimeOffset": 788918400,
+            "fTitle": "",
+            "fTitleAlign": 23,
+            "fTitleBorderSize": 0,
+            "fTitleColor": 1,
+            "fTitleFont": 42,
+            "fTitleFontSize": 0.05,
+            "fTitleH": 0,
+            "fTitlePS": "",
+            "fTitleStyle": 0,
+            "fTitleTextColor": 1,
+            "fTitleW": 0,
+            "fTitleX": 0.5,
+            "fTitleY": 0.995,
+            "fUniqueID": 0,
+            "fXaxis": {
+                "_typename": "TAttAxis",
+                "fAxisColor": 1,
+                "fLabelColor": 1,
+                "fLabelFont": 42,
+                "fLabelOffset": 0.005,
+                "fLabelSize": 0,
+                "fNdivisions": 510,
+                "fTickLength": 0.03,
+                "fTitleColor": 1,
+                "fTitleFont": 42,
+                "fTitleOffset": 1,
+                "fTitleSize": 0.035
+            },
+            "fYaxis": {
+                "_typename": "TAttAxis",
+                "fAxisColor": 1,
+                "fLabelColor": 1,
+                "fLabelFont": 42,
+                "fLabelOffset": 0.005,
+                "fLabelSize": 0,
+                "fNdivisions": 510,
+                "fTickLength": 0.03,
+                "fTitleColor": 1,
+                "fTitleFont": 42,
+                "fTitleOffset": 0,
+                "fTitleSize": 0.035
+            },
+            "fZaxis": {
+                "_typename": "TAttAxis",
+                "fAxisColor": 1,
+                "fLabelColor": 1,
+                "fLabelFont": 42,
+                "fLabelOffset": 0.005,
+                "fLabelSize": 0,
+                "fNdivisions": 510,
+                "fTickLength": 0.03,
+                "fTitleColor": 1,
+                "fTitleFont": 42,
+                "fTitleOffset": 1,
+                "fTitleSize": 0.035
+            }
+        }
+    }
+}
+***********************************************
+***********************************************
+
+

@@ -129,7 +129,7 @@ def collect_scale_data(root: Path) -> dict:
                 else:
                     label = name
                 mapping_unordered[label] = agg_paths
-        
+
         # Reorder according to SCALE_ORDER
         mapping = {}
         for label in SCALE_ORDER:
@@ -168,13 +168,14 @@ def collect_scale_data(root: Path) -> dict:
 # Figure 1 – 4 separate figures (one per metric)
 # ---------------------------------------------------------------------------
 
-def plot_fig1(data: dict, out_dir: Path, dpi: int = 180):
+def plot_fig1(data: dict, out_dir: Path, dpi: int = 300):
     """Generate 4 separate figures, one per metric, with all agent scales colored differently."""
     scales = list(data.keys())
     x = np.arange(len(scales))
 
     for metric, title, ylabel in PANEL_META:
-        fig, ax = plt.subplots(figsize=(8, 5))
+        # Smaller figsize to reduce whitespace
+        fig, ax = plt.subplots(figsize=(5, 3.2))
         fig.patch.set_facecolor("white")
 
         # Plot individual VM-run points for each agent scale
@@ -219,16 +220,23 @@ def plot_fig1(data: dict, out_dir: Path, dpi: int = 180):
             ax.plot(x, fit_y, linestyle="--", color="#666666", linewidth=1.5,
                     zorder=3, alpha=0.6, label=f"trend (slope={coeff[0]:.3g})")
 
+        # Tighten y-axis around actual data range
+        all_vals = [v for s in scales for v in data[s].get(metric, [])]
+        if all_vals:
+            ymin, ymax = min(all_vals), max(all_vals)
+            margin = (ymax - ymin) * 0.15
+            ax.set_ylim(ymin - margin, ymax + margin)
+
         ax.set_xticks(x)
-        ax.set_xticklabels(scales, fontsize=11)
-        ax.set_xlabel("Agent count", fontsize=11)
-        ax.set_ylabel(ylabel, fontsize=11)
-        ax.set_title(title, fontsize=13, fontweight="bold", pad=8)
+        ax.set_xticklabels(scales, fontsize=9)
+        ax.set_xlabel("Agent count", fontsize=9)
+        ax.set_ylabel(ylabel, fontsize=9)
+        ax.set_title(title, fontsize=11, fontweight="bold", pad=6)
         ax.yaxis.grid(True, linestyle=":", alpha=0.35, zorder=0)
         ax.set_axisbelow(True)
         ax.spines["top"].set_visible(False)
         ax.spines["right"].set_visible(False)
-        ax.tick_params(labelsize=10)
+        ax.tick_params(labelsize=9)
 
         out_path = out_dir / f"fig1_{metric}.png"
         plt.tight_layout()
@@ -241,7 +249,7 @@ def plot_fig1(data: dict, out_dir: Path, dpi: int = 180):
 # Figure 2 – dual-axis MBF / IPC trend
 # ---------------------------------------------------------------------------
 
-def plot_fig2(data: dict, out_path: Path, dpi: int = 180):
+def plot_fig2(data: dict, out_path: Path, dpi: int = 300):
     scales = list(data.keys())
 
     mbf_means = [statistics.mean(data[s]["mem_bound_frac"]) for s in scales]
@@ -322,8 +330,8 @@ def main():
         help="Output directory for figures. Default: same as --root.",
     )
     parser.add_argument(
-        "--dpi", type=int, default=180,
-        help="Figure DPI. Default: 180.",
+        "--dpi", type=int, default=300,
+        help="Figure DPI. Default: 300.",
     )
     args = parser.parse_args()
 

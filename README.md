@@ -7,7 +7,7 @@
 **Performance characterization of large-scale agent-based simulations.**
 
 This repository accompanies the ACACES 2026 poster:
-> *"Understanding Performance Bottlenecks in Large-Scale Agent-Based Simulations"*
+> *"Understanding Performance Bottlenecks of Large-Scale Agent-Based Simulations"*
 > Amina Sokoli · Dr. Abdullah Giray Yağlıkçı · CISPA Helmholtz Center for Information Security
 </td>
 <td align="right" valign="top">

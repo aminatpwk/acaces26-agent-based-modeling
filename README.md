@@ -32,7 +32,7 @@ This work presents the first rigorous, methodical evaluation of these bottleneck
 
 | Metric | Observed range | Interpretation |
 |---|---|---|
-| LLC MPKI | 6–8 (stable across scales) | Consistent LLC pressure; non-monotonic dip at 50M under investigation |
+| LLC MPKI | 6–8  | Consistent LLC pressure; non-monotonic dip at 50M under investigation |
 | Memory-bound fraction | >60% of pipeline slots | Memory latency is the dominant performance limiter, not compute throughput |
 | IPC | 0.41–0.45 | Consistently low across all scales; pipeline stalls dominate |
 | LFMR (L2\_MISS / L1\_MISS) | 0.74–0.80 | L2 cache is largely ineffective; most L1 misses escalate to main memory |

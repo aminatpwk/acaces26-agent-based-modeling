@@ -24,7 +24,7 @@ This repository accompanies the ACACES 2026 poster:
 
 Agent-based simulations are growing in scale and complexity, yet their hardware performance characteristics remain poorly understood. *No* prior work rigorously and methodically investigates the performance bottlenecks that prevent agent-based simulations from scaling to multi-billions of agents efficiently.
 
-This work presents the first rigorous, methodical evaluation of these bottlenecks, applying the [DAMOV methodology](https://github.com/CMU-SAFARI/DAMOV) to characterize data movement behavior at scale. We use [BioDynaMo](https://biodynamo.org), the state-of-the-art agent-based simulation framework, running its epidemiology use case across agent counts from 10M to 200M on **Google Cloud Platform C4 VMs** (Intel Sapphire Rapids, 16-core, 64 GB RAM, Ubuntu 22.04 LTS).
+This work presents the first rigorous, methodical evaluation of these bottlenecks, applying the [DAMOV methodology](https://github.com/CMU-SAFARI/DAMOV) to characterize data movement behavior at scale. We use [BioDynaMo](https://github.com/aminatpwk/biodynamo.git), the state-of-the-art agent-based simulation framework, running its epidemiology use case across agent counts from 10M to 200M on **Google Cloud Platform C4 VMs** (Intel Sapphire Rapids, 16-core, 64 GB RAM, Ubuntu 22.04 LTS).
 
 ---
 

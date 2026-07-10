@@ -24,7 +24,7 @@ This repository accompanies the ACACES 2026 poster:
 
 Agent-based simulations are growing in scale and complexity, yet their hardware performance characteristics remain poorly understood. *No* prior work rigorously and methodically investigates the performance bottlenecks that prevent agent-based simulations from scaling to multi-billions of agents efficiently.
 
-This work presents the first rigorous, methodical evaluation of these bottlenecks, applying the [DAMOV methodology](https://github.com/CMU-SAFARI/DAMOV) to characterize data movement behavior at scale. We use [BioDynaMo](https://github.com/aminatpwk/biodynamo.git), the state-of-the-art agent-based simulation framework, running its epidemiology use case across agent counts from 10M to 200M on **Google Cloud Platform C4 VMs** (Intel Sapphire Rapids, 16-core, 64 GB RAM, Ubuntu 22.04 LTS).
+This work presents the first rigorous, methodical evaluation of these bottlenecks, applying the [DAMOV methodology](https://github.com/CMU-SAFARI/DAMOV) to characterize data movement behavior at scale. We use [BioDynaMo](https://github.com/aminatpwk/biodynamo.git), the state-of-the-art agent-based simulation framework, running its epidemiology use case across agent counts from 10M to 200M on **Google Cloud Platform C4 VMs** (Intel Emerald Rapids, 16-core, 64 GB RAM, Ubuntu 22.04 LTS).
 
 ---
 
@@ -37,7 +37,7 @@ This work presents the first rigorous, methodical evaluation of these bottleneck
 | IPC | 0.41–0.45 | Consistently low across all scales; pipeline stalls dominate |
 | LFMR (L2\_MISS / L1\_MISS) | 0.74–0.80 | L2 cache is largely ineffective; most L1 misses escalate to main memory |
 
-On Intel Sapphire Rapids, the L2 cache serves as the LLC. Together, these metrics place the workload in the **memory-bound region** of the DAMOV classification tree, motivating a more rigorous investigation into data movement as the primary scalability bottleneck in agent-based simulations.
+On Intel Emerald Rapids, the L2 cache serves as the LLC. Together, these metrics place the workload in the **memory-bound region** of the DAMOV classification tree, motivating a more rigorous investigation into data movement as the primary scalability bottleneck in agent-based simulations.
 
 ![DAMOV workfload classification decision tree](poster/figures/DAMOV_workload_decision_tree.png)
 
@@ -92,7 +92,7 @@ acaces26-agent-based-modeling/
 
 ## Experimental setup
 
-**Hardware.** GCP C4 instances (`c4-standard-16`): 16-core Intel Sapphire Rapids, `hyperdisk-balanced`, `europe-west1-b`. PMU counters enabled via `--performance-monitoring-unit=standard`.
+**Hardware.** GCP C4 instances (`c4-standard-16`): 16-core Intel Emerald Rapids, `hyperdisk-balanced`, `europe-west1-b`. PMU counters enabled via `--performance-monitoring-unit=standard`.
 
 **Workload.** BioDynaMo's built-in epidemiology demo, configured at 10M, 50M, 100M, and 200M agents. Visualization disabled; OMP threads pinned to 16.
 

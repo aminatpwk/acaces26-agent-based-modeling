@@ -45,6 +45,19 @@ Memory capacity is also a hard scalability wall: the 200M agent simulation consu
 
 ---
 
+## Scalability results
+
+Runtime and peak memory usage, parsed from the BioDynaMo `metadata` file written by every simulation repetition...
+
+<p align="center">
+<img src="poster/figures/fig_runtime_per_iteration_vs_agents.png" alt="Runtime per iteration vs number of agents" width="48%" />
+<img src="poster/figures/fig_memory_vs_agents.png" alt="Memory consumption vs number of agents" width="48%" />
+</p>
+
+Runtime per iteration grows steeply with agent count (log-log), while peak memory grows in step with population size up to 200M agents...
+
+---
+
 ## Repository structure
 
 ```

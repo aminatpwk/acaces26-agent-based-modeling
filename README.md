@@ -19,6 +19,15 @@ This repository accompanies the ACACES 2026 poster:
 </table>
 
 ---
+## Motivation
+We want to simulate the world we live in. At the same speed it actually operates. 
+Agent-based models promise something powerful, which is the ability to simulate populations at the scale and granularity of the real world. Two applications illustrate why that matters. In precision medicine, simulating a specific patient's brain and tumor down to the cellular level could let clinicians evaluate candidate surgical paths computationally before ever making an incision. In drug and chemical safety testing, agent-based simulation is one of the in silico alternatives that could reduce reliance on animal studies, which remain slow, costly, and ethically fraught.
+
+That second application is not hypothetical policy interest, but already underway. The European Commission has committed to phasing out animal testing across fifteen legislative domains and has published a road map toward what it calls an "animal-free regulatory system" (read more here:  [*"The EU needs to back its ambition to end animal testing with cash"*](https://www.nature.com/articles/d41586-026-01882-1)).
+ 
+Large-scale agent-based simulation — the kind of *in silico* epidemiology modeling this repository studies — is one of the computational approaches such a road map would need to lean on. But that only works if these simulations can actually scale: our results show that a single-node BioDynaMo epidemiology simulation hits a hard memory wall around 200–225M agents, well short of the population sizes that a genuine animal-free regulatory or biomedical modeling pipeline would eventually require. Understanding *why* these simulations stop scaling — and where the data-movement bottlenecks come from — is a necessary step before agent-based models can be trusted to substitute for animal studies at the scale policy ambitions demand.
+
+---
 
 ## What this is
 

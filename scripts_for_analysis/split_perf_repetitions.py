@@ -18,12 +18,12 @@ import sys
 # Repetition durations (milliseconds) — edit if your timings change
 # ---------------------------------------------------------------------------
 DURATIONS_MS = [
-    32637559,   # epidemiology_1
-    31934606,   # epidemiology_2
-    32139954,   # epidemiology_3
+    15969742,   # epidemiology_1
+    15932188,   # epidemiology_2
+    15917837,   # epidemiology_3
 ]
 
-EVENTS_PER_SAMPLE = 13   # fixed number of perf event lines per 1-second sample
+EVENTS_PER_SAMPLE = 9   # fixed number of perf event lines per 1-second sample
 HEADER_LINES      = 3    # "# started on ..." + blank + "# time counts ..."
 
 

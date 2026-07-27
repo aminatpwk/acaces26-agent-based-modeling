@@ -36,32 +36,33 @@ import matplotlib.pyplot as plt
 EVENTS = [
     "instructions",
     "cycles",
-    "L2_RQSTS.MISS",
-    "L2_RQSTS.REFERENCES",
     "MEM_LOAD_COMPLETED.L1_MISS_ANY",
     "MEM_LOAD_RETIRED.L1_HIT",
     "MEM_LOAD_RETIRED.L2_HIT",
     "MEM_LOAD_RETIRED.L1_MISS",
     "MEM_LOAD_RETIRED.L2_MISS",
-    "TOPDOWN.SLOTS_P",
-    "TOPDOWN.MEMORY_BOUND_SLOTS",
-    "MEMORY_ACTIVITY.STALLS_L1D_MISS",
-    "MEMORY_ACTIVITY.STALLS_L2_MISS",
+    "MEM_LOAD_RETIRED.L3_HIT",
+    "MEM_LOAD_RETIRED.L3_MISS",
 ]
 
-DERIVED = ["IPC", "L1_miss_rate", "L2_miss_rate", "MemBound_frac",
-           "StallL1D_per_cyc", "StallL2_per_cyc"]
+DERIVED = ["IPC", "L1_miss_rate", "L2_miss_rate", "L3_miss_rate"]
 
 
 def add_derived(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     df["IPC"] = df["instructions"] / df["cycles"]
+
     l1_total = df["MEM_LOAD_RETIRED.L1_HIT"] + df["MEM_LOAD_RETIRED.L1_MISS"]
     df["L1_miss_rate"] = df["MEM_LOAD_RETIRED.L1_MISS"] / l1_total
-    df["L2_miss_rate"] = df["L2_RQSTS.MISS"] / df["L2_RQSTS.REFERENCES"]
-    df["MemBound_frac"] = df["TOPDOWN.MEMORY_BOUND_SLOTS"] / df["TOPDOWN.SLOTS_P"]
-    df["StallL1D_per_cyc"] = df["MEMORY_ACTIVITY.STALLS_L1D_MISS"] / df["cycles"]
-    df["StallL2_per_cyc"] = df["MEMORY_ACTIVITY.STALLS_L2_MISS"] / df["cycles"]
+
+    # L2/L3 miss rate from retired-load hit/miss counts
+    # (L2_RQSTS.*, TOPDOWN.*, MEMORY_ACTIVITY.* were not collected)
+    l2_total = df["MEM_LOAD_RETIRED.L2_HIT"] + df["MEM_LOAD_RETIRED.L2_MISS"]
+    df["L2_miss_rate"] = df["MEM_LOAD_RETIRED.L2_MISS"] / l2_total
+
+    l3_total = df["MEM_LOAD_RETIRED.L3_HIT"] + df["MEM_LOAD_RETIRED.L3_MISS"]
+    df["L3_miss_rate"] = df["MEM_LOAD_RETIRED.L3_MISS"] / l3_total
+
     return df
 
 

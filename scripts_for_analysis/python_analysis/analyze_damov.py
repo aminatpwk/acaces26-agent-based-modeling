@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""DAMOV characterisation + Intel Top-Down L1/L2 analysis.
+"""DAMOV characterisation + cache-hierarchy analysis.
 
 Reads the per-rep Parquet files produced by parse_perf.py and computes:
 
@@ -7,18 +7,20 @@ Reads the per-rep Parquet files produced by parse_perf.py and computes:
     - LLC MPKI   = MEM_LOAD_RETIRED.L2_MISS * 1000 / instructions
     - LFMR       = MEM_LOAD_RETIRED.L2_MISS / MEM_LOAD_RETIRED.L1_MISS
     - IPC        = instructions / cycles
-    - Mem-bound  = TOPDOWN.MEMORY_BOUND_SLOTS / TOPDOWN.SLOTS_P
 
-  Top-Down L1 (slot fractions, Intel Sapphire Rapids):
-    - Memory Bound  = TOPDOWN.MEMORY_BOUND_SLOTS / TOPDOWN.SLOTS_P
-    - (Retiring, Bad Spec, Front-End Bound are NOT directly available
-       from this 5-event subset — noted as N/A)
+  Cache-hierarchy breakdown (from retired-load events):
+    - L1 miss rate  = MEM_LOAD_RETIRED.L1_MISS / (L1_HIT + L1_MISS)
+    - L2 hit rate   = MEM_LOAD_RETIRED.L2_HIT  / MEM_LOAD_RETIRED.L1_MISS
+    - L2 miss rate  = MEM_LOAD_RETIRED.L2_MISS / (L2_HIT + L2_MISS)
+    - L3 miss rate  = MEM_LOAD_RETIRED.L3_MISS / (L3_HIT + L3_MISS)
 
-  Top-Down L2 memory sub-breakdown:
-    - L1 stall fraction  = MEMORY_ACTIVITY.STALLS_L1D_MISS / TOPDOWN.SLOTS_P
-    - L2 stall fraction  = MEMORY_ACTIVITY.STALLS_L2_MISS  / TOPDOWN.SLOTS_P
-    - L2 hit rate        = MEM_LOAD_RETIRED.L2_HIT / MEM_LOAD_RETIRED.L1_MISS
-    - LLC miss rate      = MEM_LOAD_RETIRED.L2_MISS / MEM_LOAD_RETIRED.L1_MISS (= LFMR)
+  NOTE: Top-Down slot-based metrics (Memory Bound, Retiring, Bad Speculation,
+  Front-End Bound, and the L1D/L2 stall fractions) require TOPDOWN.* and
+  MEMORY_ACTIVITY.* counters, which are NOT part of the collected event set
+  (see EVENTS below) and are therefore not computed here. Likewise
+  L2_RQSTS.MISS/REFERENCES were not collected, so the L2 miss rate above is
+  derived from MEM_LOAD_RETIRED.L2_HIT/L2_MISS instead (retired loads only,
+  not all L2 requests/prefetches).
 
   For each metric: per-rep mean, mean-of-means, CV across reps, range %.
   Outputs:
@@ -41,32 +43,30 @@ import matplotlib.pyplot as plt
 
 EVENTS = [
     "instructions", "cycles",
-    "L2_RQSTS.MISS", "L2_RQSTS.REFERENCES",
     "MEM_LOAD_COMPLETED.L1_MISS_ANY",
     "MEM_LOAD_RETIRED.L1_HIT", "MEM_LOAD_RETIRED.L2_HIT",
     "MEM_LOAD_RETIRED.L1_MISS", "MEM_LOAD_RETIRED.L2_MISS",
-    "TOPDOWN.SLOTS_P", "TOPDOWN.MEMORY_BOUND_SLOTS",
-    "MEMORY_ACTIVITY.STALLS_L1D_MISS", "MEMORY_ACTIVITY.STALLS_L2_MISS",
+    "MEM_LOAD_RETIRED.L3_HIT", "MEM_LOAD_RETIRED.L3_MISS",
 ]
 
-# DAMOV thresholds (from the DAMOV paper, Table 1)
+# DAMOV thresholds (from the DAMOV paper, Table 1).
+# NOTE: the paper's "mem_bound_frac > 0.2" criterion is omitted here because
+# TOPDOWN.MEMORY_BOUND_SLOTS / TOPDOWN.SLOTS_P was not collected. The
+# DAMOV verdict below is therefore based on 3 of the paper's 4 criteria.
 DAMOV_THRESHOLDS = {
-    "llc_mpki":      {"threshold": 1.0,  "direction": ">", "label": "LLC MPKI > 1 → memory-bound candidate"},
-    "lfmr":          {"threshold": 0.1,  "direction": ">", "label": "LFMR > 0.1 → significant LLC traffic"},
-    "mem_bound_frac":{"threshold": 0.2,  "direction": ">", "label": "Mem-bound fraction > 0.2 → memory-bound"},
-    "ipc":           {"threshold": 1.0,  "direction": "<", "label": "IPC < 1.0 → limited by memory/stalls"},
+    "l2_mpki": {"threshold": 1.0, "direction": ">", "label": "LLC MPKI > 1 → memory-bound candidate"},
+    "lfmr":     {"threshold": 0.1, "direction": ">", "label": "LFMR > 0.1 → significant LLC traffic"},
+    "ipc":      {"threshold": 1.0, "direction": "<", "label": "IPC < 1.0 → limited by memory/stalls"},
 }
 
 METRIC_DESCRIPTIONS = {
-    "llc_mpki":          "LLC MPKI (L2_MISS×1000/instructions)",
-    "lfmr":              "LFMR (L2_MISS/L1_MISS)",
-    "ipc":               "IPC (instructions/cycles)",
-    "mem_bound_frac":    "Memory-bound fraction (TDB)",
-    "l1_stall_frac":     "L1D stall fraction (STALLS_L1D/SLOTS)",
-    "l2_stall_frac":     "L2 stall fraction (STALLS_L2/SLOTS)",
-    "l2_hit_rate":       "L2 hit rate (L2_HIT/L1_MISS)",
-    "l2_miss_rate_req":  "L2 miss rate (L2_RQSTS.MISS/L2_RQSTS.REF) — includes prefetcher",
-    "l1_miss_rate":      "L1 miss rate (L1_MISS/(L1_HIT+L1_MISS))",
+    "l2_mpki":      "LLC MPKI (L2_MISS×1000/instructions)",
+    "lfmr":          "LFMR (L2_MISS/L1_MISS)",
+    "ipc":           "IPC (instructions/cycles)",
+    "l1_miss_rate":  "L1 miss rate (L1_MISS/(L1_HIT+L1_MISS))",
+    "l2_hit_rate":   "L2 hit rate (L2_HIT/L1_MISS)",
+    "l2_miss_rate":  "L2 miss rate (L2_MISS/(L2_HIT+L2_MISS))",
+    "l3_miss_rate":  "L3 miss rate (L3_MISS/(L3_HIT+L3_MISS))",
 }
 
 
@@ -76,30 +76,24 @@ def load_rep(path: Path) -> pd.DataFrame:
 
 
 def compute_damov_per_tick(df: pd.DataFrame) -> pd.DataFrame:
-    """Compute per-tick DAMOV and Top-Down L2 metrics."""
+    """Compute per-tick DAMOV and cache-hierarchy metrics from retired-load events."""
     out = pd.DataFrame({"ts": df["ts"]})
     instr = df["instructions"]
     cyc   = df["cycles"]
     l1m   = df["MEM_LOAD_RETIRED.L1_MISS"]
+    l1h   = df["MEM_LOAD_RETIRED.L1_HIT"]
     l2m   = df["MEM_LOAD_RETIRED.L2_MISS"]
     l2h   = df["MEM_LOAD_RETIRED.L2_HIT"]
-    l1h   = df["MEM_LOAD_RETIRED.L1_HIT"]
-    slots = df["TOPDOWN.SLOTS_P"]
-    mbs   = df["TOPDOWN.MEMORY_BOUND_SLOTS"]
-    sl1d  = df["MEMORY_ACTIVITY.STALLS_L1D_MISS"]
-    sl2   = df["MEMORY_ACTIVITY.STALLS_L2_MISS"]
-    l2rq_m = df["L2_RQSTS.MISS"]
-    l2rq_r = df["L2_RQSTS.REFERENCES"]
+    l3m   = df["MEM_LOAD_RETIRED.L3_MISS"]
+    l3h   = df["MEM_LOAD_RETIRED.L3_HIT"]
 
-    out["llc_mpki"]         = l2m * 1000.0 / instr
-    out["lfmr"]             = l2m / l1m
-    out["ipc"]              = instr / cyc
-    out["mem_bound_frac"]   = mbs / slots
-    out["l1_stall_frac"]    = sl1d / slots
-    out["l2_stall_frac"]    = sl2 / slots
-    out["l2_hit_rate"]      = l2h / l1m
-    out["l2_miss_rate_req"] = l2rq_m / l2rq_r
-    out["l1_miss_rate"]     = l1m / (l1h + l1m)
+    out["l2_mpki"]     = l2m * 1000.0 / instr
+    out["lfmr"]         = l2m / l1m
+    out["ipc"]          = instr / cyc
+    out["l1_miss_rate"] = l1m / (l1h + l1m)
+    out["l2_hit_rate"]  = l2h / l1m
+    out["l2_miss_rate"] = l2m / (l2h + l2m)
+    out["l3_miss_rate"] = l3m / (l3h + l3m)
     return out
 
 
@@ -160,7 +154,7 @@ def plot_strip(per_rep: pd.DataFrame, out_path: Path) -> None:
     for j in range(n, len(axes)):
         axes[j].axis("off")
 
-    fig.suptitle("DAMOV + Top-Down per-rep means (±2σ band, red dashed = DAMOV threshold)",
+    fig.suptitle("DAMOV + cache-hierarchy per-rep means (±2σ band, red dashed = DAMOV threshold)",
                  fontsize=11)
     fig.tight_layout(rect=(0, 0, 1, 0.97))
     fig.savefig(out_path, dpi=130)
@@ -204,9 +198,8 @@ def main() -> int:
         row = {"rep": rep}
         row.update(rep_scalar(tick_metrics))
         per_rep_rows.append(row)
-        print(f"  rep {rep:2d}: llc_mpki={row['llc_mpki']:.3f}  "
-              f"lfmr={row['lfmr']:.3f}  ipc={row['ipc']:.3f}  "
-              f"mem_bound={row['mem_bound_frac']:.3f}")
+        print(f"  rep {rep:2d}: l2_mpki={row['l2_mpki']:.3f}  "
+              f"lfmr={row['lfmr']:.3f}  ipc={row['ipc']:.3f}")
 
     per_rep = pd.DataFrame(per_rep_rows)
     per_rep.to_csv(out_dir / "per_rep.csv", index=False)
@@ -217,10 +210,15 @@ def main() -> int:
     for m in metrics:
         vals = per_rep[m].to_numpy()
         vals = vals[np.isfinite(vals)]
+        if vals.size == 0:
+            print(f"  WARNING: metric '{m}' has no finite values in any rep "
+                  f"(source event likely all-zero/uncounted) — reporting as NaN",
+                  file=sys.stderr)
         mu   = float(vals.mean()) if vals.size else float("nan")
         sd   = float(vals.std(ddof=1)) if vals.size > 1 else 0.0
-        cv   = sd / mu if mu != 0 else float("nan")
-        rng  = float((vals.max() - vals.min()) / mu * 100) if mu != 0 else float("nan")
+        cv   = sd / mu if (vals.size and mu != 0) else float("nan")
+        rng  = (float((vals.max() - vals.min()) / mu * 100)
+                if (vals.size and mu != 0) else float("nan"))
         agg_rows.append({
             "metric":           m,
             "description":      METRIC_DESCRIPTIONS.get(m, ""),
@@ -249,24 +247,28 @@ def main() -> int:
         if row["metric"] in DAMOV_THRESHOLDS:
             lines.append(f"    ({DAMOV_THRESHOLDS[row['metric']]['label']})")
     lines.append("")
-    lines.append("Top-Down L2 memory sub-breakdown")
+    lines.append("Cache-hierarchy sub-breakdown")
     lines.append("-" * 70)
-    td_metrics = ["l1_stall_frac", "l2_stall_frac", "l2_hit_rate",
-                  "l2_miss_rate_req", "l1_miss_rate"]
+    td_metrics = ["l1_miss_rate", "l2_hit_rate", "l2_miss_rate", "l3_miss_rate"]
     for _, row in agg[agg["metric"].isin(td_metrics)].iterrows():
         lines.append(f"  {row['metric']:20s}  mean={row['mean']:>10.4f}  "
                      f"CV={row['cv_pct']:5.2f}%  range={row['range_pct']:5.2f}%")
     lines.append("")
-    lines.append("Top-Down L1 note")
+    lines.append("Top-Down note")
     lines.append("-" * 70)
-    lines.append("  Retiring / Bad Speculation / Front-End Bound are not directly")
-    lines.append("  measurable from this 13-event perf group (would require separate")
-    lines.append("  PERF_METRICS_* counters on Sapphire Rapids). Only Memory Bound")
-    lines.append("  (= TOPDOWN.MEMORY_BOUND_SLOTS / TOPDOWN.SLOTS_P) is available.")
+    lines.append("  No Top-Down slot metrics (Retiring, Bad Speculation, Front-End")
+    lines.append("  Bound, or Memory Bound) are measurable from this event set —")
+    lines.append("  TOPDOWN.* and MEMORY_ACTIVITY.* counters were not collected.")
+    lines.append("  L2_RQSTS.MISS/REFERENCES were also not collected, so the L2")
+    lines.append("  miss rate above is derived from retired-load hit/miss counts")
+    lines.append("  (MEM_LOAD_RETIRED.L2_HIT/L2_MISS) rather than all L2 requests.")
+    lines.append("  The DAMOV mem-bound-fraction criterion (>0.2) is therefore")
+    lines.append("  omitted from the verdict below; only LLC MPKI, LFMR, and IPC")
+    lines.append("  are evaluated against the paper's thresholds.")
     lines.append("")
 
     # Threshold summary
-    lines.append("DAMOV threshold summary")
+    lines.append("DAMOV threshold summary (3 of 4 paper criteria — see note above)")
     lines.append("-" * 70)
     all_pass = True
     for m, info in DAMOV_THRESHOLDS.items():
@@ -281,10 +283,11 @@ def main() -> int:
         lines.append(f"    measured mean = {row.iloc[0]['mean']:.4f}  {verdict}")
     lines.append("")
     if all_pass:
-        lines.append("  ✓ ALL DAMOV thresholds exceeded → workload qualifies as")
-        lines.append("    memory-bound; PIM offloading is motivated.")
+        lines.append("  ✓ All available DAMOV thresholds exceeded → workload is a")
+        lines.append("    strong memory-bound candidate; PIM offloading is motivated.")
+        lines.append("    (Mem-bound-fraction criterion not evaluated — see note above.)")
     else:
-        lines.append("  ✗ Not all DAMOV thresholds exceeded — see individual metrics.")
+        lines.append("  ✗ Not all available DAMOV thresholds exceeded — see individual metrics.")
     lines.append("")
     lines.append("=" * 70)
 

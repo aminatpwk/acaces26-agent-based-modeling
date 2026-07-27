@@ -38,17 +38,13 @@ import matplotlib.pyplot as plt
 EVENTS = [
     "instructions",
     "cycles",
-    "L2_RQSTS.MISS",
-    "L2_RQSTS.REFERENCES",
     "MEM_LOAD_COMPLETED.L1_MISS_ANY",
     "MEM_LOAD_RETIRED.L1_HIT",
     "MEM_LOAD_RETIRED.L2_HIT",
     "MEM_LOAD_RETIRED.L1_MISS",
     "MEM_LOAD_RETIRED.L2_MISS",
-    "TOPDOWN.SLOTS_P",
-    "TOPDOWN.MEMORY_BOUND_SLOTS",
-    "MEMORY_ACTIVITY.STALLS_L1D_MISS",
-    "MEMORY_ACTIVITY.STALLS_L2_MISS",
+    "MEM_LOAD_RETIRED.L3_HIT",
+    "MEM_LOAD_RETIRED.L3_MISS",
 ]
 
 PERCENTILES = [1, 5, 25, 50, 75, 95, 99]
@@ -113,12 +109,26 @@ def rolling_cv(x: pd.Series, window: int) -> float:
 def derived_metrics(df: pd.DataFrame) -> pd.DataFrame:
     out = pd.DataFrame({"ts": df["ts"]})
     out["IPC"] = df["instructions"] / df["cycles"]
+
     l1_total = df["MEM_LOAD_RETIRED.L1_HIT"] + df["MEM_LOAD_RETIRED.L1_MISS"]
     out["L1_miss_rate"] = df["MEM_LOAD_RETIRED.L1_MISS"] / l1_total
-    out["L2_miss_rate"] = df["L2_RQSTS.MISS"] / df["L2_RQSTS.REFERENCES"]
-    out["MemBound_frac"] = df["TOPDOWN.MEMORY_BOUND_SLOTS"] / df["TOPDOWN.SLOTS_P"]
-    out["StallL1D_per_cyc"] = df["MEMORY_ACTIVITY.STALLS_L1D_MISS"] / df["cycles"]
-    out["StallL2_per_cyc"] = df["MEMORY_ACTIVITY.STALLS_L2_MISS"] / df["cycles"]
+
+    # L2 miss rate from retired-load hit/miss counts
+    # (L2_RQSTS.* events were not collected in this event set)
+    l2_total = df["MEM_LOAD_RETIRED.L2_HIT"] + df["MEM_LOAD_RETIRED.L2_MISS"]
+    out["L2_miss_rate"] = df["MEM_LOAD_RETIRED.L2_MISS"] / l2_total
+
+    l3_total = df["MEM_LOAD_RETIRED.L3_HIT"] + df["MEM_LOAD_RETIRED.L3_MISS"]
+    out["L3_miss_rate"] = df["MEM_LOAD_RETIRED.L3_MISS"] / l3_total
+
+    # Optional: only computed if the underlying events happen to be present
+    if "TOPDOWN.MEMORY_BOUND_SLOTS" in df.columns and "TOPDOWN.SLOTS_P" in df.columns:
+        out["MemBound_frac"] = df["TOPDOWN.MEMORY_BOUND_SLOTS"] / df["TOPDOWN.SLOTS_P"]
+    if "MEMORY_ACTIVITY.STALLS_L1D_MISS" in df.columns:
+        out["StallL1D_per_cyc"] = df["MEMORY_ACTIVITY.STALLS_L1D_MISS"] / df["cycles"]
+    if "MEMORY_ACTIVITY.STALLS_L2_MISS" in df.columns:
+        out["StallL2_per_cyc"] = df["MEMORY_ACTIVITY.STALLS_L2_MISS"] / df["cycles"]
+
     return out
 
 

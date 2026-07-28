@@ -1,10 +1,10 @@
 """
-generate_figures.py
+generate_abstract_figures.py
 -------------------
 
 Usage:
-  python generate_figures.py
-  python generate_figures.py --root /path/to/repo --dpi 300 --out /path/to/outdir
+  python generate_abstract_figures.py
+  python generate_abstract_figures.py --root /path/to/repo --dpi 300 --out /path/to/outdir
 """
 
 import argparse
@@ -59,7 +59,7 @@ THRESHOLDS = {
 }
 
 PANEL_META = [
-    ("llc_mpki",       "LLC MPKI",               "Misses per kilo-instruction"),
+    ("llc_mpki",       "L2 MPKI",                "Misses per kilo-instruction"),
     ("mem_bound_frac", "Memory-bound fraction",   "Fraction of pipeline slots"),
     ("ipc",            "IPC",                     "Instructions per cycle"),
     ("lfmr",           "LFMR",                    "L2_MISS / L1_MISS"),

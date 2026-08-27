@@ -1,3 +1,8 @@
+[![ACACES 2026](https://img.shields.io/badge/ACACES-2026-blue)](https://www.hipeac.net/acaces/2026/)
+[![BioDynaMo](https://img.shields.io/badge/BioDynaMo-Agent--Based%20Simulation-orange)](https://biodynamo.org/)
+[![Python](https://img.shields.io/badge/Python-Analysis-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Linux](https://img.shields.io/badge/Linux-Ubuntu%2022.04-E95420?logo=ubuntu&logoColor=white)](https://ubuntu.com/)
+
 <table>
 <tr>
 <td>
